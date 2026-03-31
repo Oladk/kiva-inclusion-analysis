@@ -1,8 +1,7 @@
 -- ============================================================
--- ANALYSE KIVA — Requêtes Analytiques SQLite
+-- ANALYSE KIVA : Requêtes Analytiques SQLite
 -- Projet  : Inclusion Financière ASS
 -- Auteur  : Ronald Dossou-Kohi | ISE Statisticien
--- Données : 171 391 prêts Kiva — 28 pays ASS — 2014-2019
 -- ============================================================
 -- Séparateur de requêtes : -- @@
 -- Chaque requête répond à une question analytique précise
@@ -53,7 +52,7 @@ LIMIT 10
 
 
 -- @@
--- Q3 : Gap de genre par secteur — montant moyen F vs M
+-- Q3 : Gap de genre par secteur : montant moyen F vs M
 SELECT
     sector,
     ROUND(AVG(CASE WHEN gender_clean = 'female' THEN loan_amount END), 0) AS mediane_femmes,
@@ -85,9 +84,9 @@ SELECT
     c.n_partners,
     CASE
         WHEN c.avg_mpi >= 0.4 AND c.pct_of_ssa >= 5
-            THEN 'Bien couvert ET pauvre ✅'
+            THEN 'Bien couvert ET pauvre '
         WHEN c.avg_mpi >= 0.4 AND c.pct_of_ssa < 2
-            THEN 'Pauvre ET sous-couvert ⚠️'
+            THEN 'Pauvre ET sous-couvert '
         WHEN c.avg_mpi < 0.3 AND c.pct_of_ssa >= 5
             THEN 'Bien couvert, moins pauvre'
         ELSE 'Standard'
