@@ -1,10 +1,10 @@
 # ============================================================
-# NOTEBOOK 05 — Analyse du Genre
+# NOTEBOOK 05 : Analyse du Genre
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,22 +30,22 @@ PALETTE = {
     "unknown" : "#95A5A6",
 }
 
-print("✅ Imports OK")
+print(" Imports OK")
 
 
-# %% CELLULE 2 — Chargement
+# %% CELLULE 2 : Chargement
 loans = pd.read_parquet(DATA_PROC / "loans_ssa_mpi.parquet")
-print(f"✅ {len(loans):,} prêts ASS chargés")
+print(f" {len(loans):,} prêts ASS chargés")
 
 # Distribution genre
-print(f"\n📊 Distribution gender_clean :")
+print(f"\n Distribution gender_clean :")
 dist = loans["gender_clean"].value_counts()
 for cat, count in dist.items():
     pct = count / len(loans) * 100
     print(f"   {cat:<12} {count:>7,}  ({pct:.1f}%)")
 
 
-# %% CELLULE 3 — Filtrage pour l'analyse de genre
+# %% CELLULE 3 : Filtrage pour l'analyse de genre
 # ─────────────────────────────────────────────────────────
 # On garde uniquement female et male pour les comparaisons.
 # Les "mixed" (groupes mixtes) et "unknown" sont exclus car :
@@ -59,7 +59,7 @@ for cat, count in dist.items():
 # ─────────────────────────────────────────────────────────
 
 # Vérification : les "unknown" sont-ils systématiques ?
-print("🔍 Profil des prêts 'unknown' vs reste :\n")
+print(" Profil des prêts 'unknown' vs reste :\n")
 unknown_profile = pd.DataFrame({
     "unknown" : loans[loans["gender_clean"] == "unknown"][
         ["loan_amount","is_fully_funded"]
@@ -75,11 +75,11 @@ print("   → Si elles divergent : mentionner le biais dans le rapport")
 # Filtrage
 loans_g = loans[loans["gender_clean"].isin(["female","male"])].copy()
 pct_conserve = len(loans_g) / len(loans) * 100
-print(f"\n✅ Dataset genre : {len(loans_g):,} prêts ({pct_conserve:.1f}% du total ASS)")
+print(f"\n Dataset genre : {len(loans_g):,} prêts ({pct_conserve:.1f}% du total ASS)")
 print(f"   Exclus : {len(loans) - len(loans_g):,} prêts (mixed + unknown)")
 
 
-# %% CELLULE 4 — Représentation : Nombre vs Volume
+# %% CELLULE 4 : Représentation : Nombre vs Volume
 # ─────────────────────────────────────────────────────────
 # C'est la distinction analytique centrale de ce notebook.
 #
@@ -108,7 +108,7 @@ gender_overview["pct_loans"]  = gender_overview["n_loans"] / len(loans_g) * 100
 gender_overview["pct_volume"] = gender_overview["total_volume"] / loans_g["loan_amount"].sum() * 100
 gender_overview["ratio_vol_count"] = gender_overview["pct_volume"] / gender_overview["pct_loans"]
 
-print("📊 Vue d'ensemble — Genre :\n")
+print(" Vue d'ensemble : Genre :\n")
 print(gender_overview.round(3).to_string())
 
 # Calcul de l'écart
@@ -116,7 +116,7 @@ f_count  = gender_overview.loc["female","pct_loans"]
 f_volume = gender_overview.loc["female","pct_volume"]
 ecart    = f_count - f_volume
 
-print(f"\n📊 INSIGHT CLÉ :")
+print(f"\n INSIGHT CLÉ :")
 print(f"   Femmes : {f_count:.1f}% des prêts en NOMBRE")
 print(f"   Femmes : {f_volume:.1f}% du VOLUME total")
 print(f"   Écart  : {ecart:.1f} points de pourcentage")
@@ -124,7 +124,7 @@ print(f"   → Les femmes sont sur-représentées en nombre mais")
 print(f"     sous-représentées en volume de capital alloué")
 
 
-# %% CELLULE 5 — Visualisation : Nombre vs Volume
+# %% CELLULE 5 : Visualisation : Nombre vs Volume
 fig, axes = plt.subplots(1, 3, figsize=(16, 6))
 fig.suptitle("Genre : Représentation en Nombre vs en Volume de Capital\n"
              "Afrique Subsaharienne — Kiva",
@@ -180,7 +180,7 @@ axes[2].spines["right"].set_visible(False)
 
 # Note méthodologique
 fig.text(0.5, -0.03,
-    "⚠️  L'écart de montant peut refléter les pratiques des IMF (secteurs ciblés, "
+    " L'écart de montant peut refléter les pratiques des IMF (secteurs ciblés, "
     "garanties exigées) plutôt qu'une discrimination directe.",
     ha="center", fontsize=8.5, style="italic", color="#555"
 )
@@ -188,10 +188,10 @@ fig.text(0.5, -0.03,
 plt.tight_layout()
 plt.savefig(FIGURES / "05_genre_nombre_vs_volume.png", dpi=150, bbox_inches="tight")
 plt.show()
-print("✅ Figure sauvegardée → 05_genre_nombre_vs_volume.png")
+print(" Figure sauvegardée → 05_genre_nombre_vs_volume.png")
 
 
-# %% CELLULE 6 — Test statistique : Mann-Whitney U
+# %% CELLULE 6 : Test statistique : Mann-Whitney U
 # ─────────────────────────────────────────────────────────
 # POURQUOI Mann-Whitney et pas un t-test ?
 #
@@ -218,7 +218,7 @@ n_total = len(female_amounts) + len(male_amounts)
 z_score = stats.norm.ppf(p_mw / 2)
 effect_r = abs(z_score) / np.sqrt(n_total)
 
-print(f"📊 TEST DE MANN-WHITNEY U — Montants F vs M")
+print(f" TEST DE MANN-WHITNEY U : Montants F vs M")
 print(f"   H0 : Les distributions de montants sont identiques")
 print(f"\n   Médiane Femmes : ${female_amounts.median():,.0f}")
 print(f"   Médiane Hommes : ${male_amounts.median():,.0f}")
@@ -233,7 +233,7 @@ eff = "négligeable (<0.1)" if effect_r < 0.1 else \
       "modéré (0.3-0.5)"   if effect_r < 0.5 else "large (>0.5)"
 
 print(f"\n   → Test {sig} | Effect size : {eff}")
-print(f"\n⚠️  ATTENTION : Significatif ≠ important.")
+print(f"\n ATTENTION : Significatif ≠ important.")
 print(f"   Avec {n_total:,} observations, même un écart minuscule")
 print(f"   peut être statistiquement significatif.")
 print(f"   C'est pourquoi l'effect size est indispensable.")
@@ -248,7 +248,7 @@ print(f"   C'est pourquoi l'effect size est indispensable.")
 # Exemple : Si les femmes font surtout du commerce
 # (petits montants) et les hommes surtout de l'agriculture
 # (grands équipements), l'écart de montant s'explique
-# par le secteur — pas par le genre.
+# par le secteur ; pas par le genre.
 #
 # On calcule le ratio H/F DANS CHAQUE SECTEUR.
 # Si le ratio est similaire partout → gap réel indépendant du secteur
@@ -267,12 +267,12 @@ sector_gender["ratio_H_F"] = sector_gender["male"] / sector_gender["female"]
 sector_gender["gap_abs"]   = sector_gender["male"] - sector_gender["female"]
 sector_gender = sector_gender.sort_values("ratio_H_F", ascending=False)
 
-print("📊 CONTRÔLE SECTORIEL — Ratio Médiane Hommes/Femmes :\n")
+print(" CONTRÔLE SECTORIEL : Ratio Médiane Hommes/Femmes :\n")
 print(f"{'Secteur':<20} {'Médiane F':>10} {'Médiane M':>10} {'Ratio H/F':>10}  Signal")
 print("-" * 65)
 for sector, row in sector_gender.iterrows():
-    signal = "⚠️  Écart important" if row["ratio_H_F"] > 1.5 else \
-             "✅ Proche de 1"      if row["ratio_H_F"] < 1.1 else "~"
+    signal = " Écart important" if row["ratio_H_F"] > 1.5 else \
+             " Proche de 1"      if row["ratio_H_F"] < 1.1 else "~"
     print(f"  {sector:<20} ${row['female']:>8,.0f}  ${row['male']:>8,.0f}  "
           f"{row['ratio_H_F']:>9.2f}x  {signal}")
 
@@ -282,7 +282,7 @@ print(f"   → Si ratio > 1 dans TOUS les secteurs : gap réel, pas seulement")
 print(f"     expliqué par la composition sectorielle")
 
 
-# %% CELLULE 8 — Visualisation : Gap de genre par secteur
+# %% CELLULE 8 : Visualisation : Gap de genre par secteur
 fig, axes = plt.subplots(1, 2, figsize=(16, 7))
 fig.suptitle("Gap de Genre par Secteur — Kiva Afrique Subsaharienne",
              fontsize=13, fontweight="bold")
@@ -337,7 +337,7 @@ legend_patches = [
 axes[1].legend(handles=legend_patches, fontsize=8, loc="lower right")
 
 fig.text(0.5, -0.03,
-    "⚠️  Ces écarts peuvent refléter les pratiques de sélection des IMF "
+    " Ces écarts peuvent refléter les pratiques de sélection des IMF "
     "(montants accordés) plutôt qu'une discrimination directe.",
     ha="center", fontsize=8.5, style="italic", color="#555"
 )
@@ -345,10 +345,10 @@ fig.text(0.5, -0.03,
 plt.tight_layout()
 plt.savefig(FIGURES / "05_genre_par_secteur.png", dpi=150, bbox_inches="tight")
 plt.show()
-print("✅ Figure sauvegardée → 05_genre_par_secteur.png")
+print(" Figure sauvegardée → 05_genre_par_secteur.png")
 
 
-# %% CELLULE 9 — Gap de genre par pays
+# %% CELLULE 9 : Gap de genre par pays
 pays_genre = (
     loans_g
     .groupby(["country","gender_clean"])["loan_amount"]
@@ -371,7 +371,7 @@ pays_genre_f = pays_genre[
     (pays_genre["count_male"]   >= 200)
 ].dropna()
 
-print(f"📊 Gap de genre par pays ({len(pays_genre_f)} pays avec données suffisantes) :\n")
+print(f" Gap de genre par pays ({len(pays_genre_f)} pays avec données suffisantes) :\n")
 print(f"{'Pays':<25} {'Méd. F':>8} {'Méd. M':>8} {'Ratio H/F':>10} {'% Femmes':>10}")
 print("-" * 65)
 for country, row in pays_genre_f.sort_values("ratio_H_F", ascending=False).iterrows():
@@ -379,7 +379,7 @@ for country, row in pays_genre_f.sort_values("ratio_H_F", ascending=False).iterr
           f"  {row['ratio_H_F']:>9.2f}x  {row['pct_female']:>8.1f}%")
 
 
-# %% CELLULE 10 — Délai de financement par genre
+# %% CELLULE 10 : Délai de financement par genre
 # ─────────────────────────────────────────────────────────
 # Hypothèse : les prêts féminins se financent plus vite
 # car les prêteurs Kiva les perçoivent comme moins risqués
@@ -398,7 +398,7 @@ dtf = loans_g[
 ].copy()
 
 delai_gender = dtf.groupby("gender_clean")["days_to_fund"].agg(["median","mean","count"])
-print(f"📊 DÉLAI DE FINANCEMENT par genre (prêts 0-90 jours) :\n")
+print(f" DÉLAI DE FINANCEMENT par genre (prêts 0-90 jours) :\n")
 print(delai_gender.round(2).to_string())
 
 # Test Mann-Whitney sur les délais
@@ -406,9 +406,9 @@ f_delai = dtf[dtf["gender_clean"] == "female"]["days_to_fund"]
 m_delai = dtf[dtf["gender_clean"] == "male"]["days_to_fund"]
 
 stat_d, p_d = stats.mannwhitneyu(f_delai, m_delai, alternative="two-sided")
-print(f"\n   Mann-Whitney — délai de financement :")
+print(f"\n   Mann-Whitney : délai de financement :")
 print(f"   p-value = {p_d:.6f}")
-print(f"   → {'Différence significative ✅' if p_d < 0.05 else 'Pas de différence significative'}")
+print(f"   → {'Différence significative ' if p_d < 0.05 else 'Pas de différence significative'}")
 
 if p_d < 0.05:
     faster = "Femmes" if f_delai.median() < m_delai.median() else "Hommes"
@@ -416,28 +416,28 @@ if p_d < 0.05:
           f"(médiane F={f_delai.median():.1f}j vs M={m_delai.median():.1f}j)")
 
 
-# %% CELLULE 11 — Synthèse genre
+# %% CELLULE 11 : Synthèse genre
 print(f"""
 {'='*60}
- SYNTHÈSE — NOTEBOOK 05
+ SYNTHÈSE : NOTEBOOK 05
 {'='*60}
 
- FINDING #4 — Représentation vs Capital :
+ FINDING #4 : Représentation vs Capital :
    Femmes = {f_count:.1f}% des prêts | {f_volume:.1f}% du volume
    Écart : {ecart:.1f} points de pourcentage
 
- FINDING #5 — Gap de montant médian :
+ FINDING #5 : Gap de montant médian :
    Femmes : ${female_amounts.median():,.0f}
    Hommes : ${male_amounts.median():,.0f}
    Ratio  : {male_amounts.median()/female_amounts.median():.2f}x
    Test MW: p = {p_mw:.6f} → {'Significatif' if p_mw < 0.05 else 'Non significatif'}
    Effect size : {eff}
 
- FINDING #6 — Gap contrôlé par secteur :
+ FINDING #6 : Gap contrôlé par secteur :
    Ratio H/F moyen intra-secteur : {avg_ratio:.2f}x
    → Le gap persiste après contrôle sectoriel
 
- FINDING #7 — Délai de financement :
+ FINDING #7 : Délai de financement :
    Médiane F : {f_delai.median():.1f} jours
    Médiane M : {m_delai.median():.1f} jours
 
@@ -446,4 +446,3 @@ print(f"""
    → 05_genre_par_secteur.png
 
 """)
-# %%

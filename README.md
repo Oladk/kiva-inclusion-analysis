@@ -1,9 +1,9 @@
-# 🌍 Analyse de l'Inclusion Financière — Afrique Subsaharienne
+# Analyse de l'Inclusion Financière : Afrique Subsaharienne
 ### Données Kiva.org | 171 391 prêts | 28 pays | 2014–2019
 
 **Auteur :** Ronald Dossou-Kohi | ISE Statisticien | Data Analyst  
 **Stack :** Python · SQL · Power BI · Git  
-**Statut :** ✅ Terminé
+**Statut :**  Terminé
 
 ---
 
@@ -14,7 +14,7 @@ avec un gap de genre de 12 points et des taux sous 20% dans plusieurs pays sahé
 Ce projet analyse les flux de microcrédit Kiva pour identifier les gaps d'allocation
 et produire des recommandations actionnables pour les IMF et les bailleurs.
 
-> ⚠️ **Avertissement méthodologique :** Les données Kiva représentent un sous-ensemble
+> **Avertissement méthodologique :** Les données Kiva représentent un sous-ensemble
 > biaisé du microcrédit en ASS. Chaque conclusion est accompagnée de ses limites explicites.
 
 ---
@@ -31,7 +31,7 @@ et produire des recommandations actionnables pour les IMF et les bailleurs.
 | F6 | Prêts féminins financés 44% plus vite | 9.2j vs 13.3j |
 | F7 | Taille du prêt = déterminant #1 | AUC Random Forest = 0.866 |
 
-📄 **Rapport complet :** [reports/findings_report.md](reports/findings_report.md)
+**Rapport complet :** [reports/findings_report.md](reports/findings_report.md)
 
 ---
 
@@ -52,12 +52,6 @@ kiva-inclusion-analysis/
 │   ├── 06_fieldpartners.py     ← Field Partners & modélisation
 │   └── 07_export_powerbi.py    ← Export tables pour Power BI
 │
-├── src/
-│   ├── __init__.py
-│   ├── data_loader.py          ← Chargement & cache des données
-│   ├── preprocessing.py        ← Pipeline de nettoyage
-│   └── visualization.py        ← Templates de visualisation
-│
 ├── data/
 │   ├── raw/                    ← ⛔ Gitignored (CSV Kiva ~200 Mo)
 │   └── processed/              ← ⛔ Gitignored (générés par les notebooks)
@@ -71,8 +65,7 @@ kiva-inclusion-analysis/
 │   └── kiva_analysis.sql       ← Requêtes analytiques SQLite
 │
 └── docs/
-    ├── analytical_framework.md ← Cadre théorique & méthodologie
-    └── data_dictionary.md      ← Dictionnaire des variables
+    └── Inclusion Financière - Kiva.pbix      ← Dashboard Power BI
 ```
 
 ---
@@ -132,7 +125,7 @@ dans `data/processed/powerbi/` par le notebook 07.
 
 - **World Bank** (2024). *Global Findex Database 2024*
 - **CGAP** (2023). *Microfinance Consensus Guidelines*
-- **OIT / Banque Mondiale** (2022). *Emploi par secteur — Afrique Subsaharienne*
+- **OIT / Banque Mondiale** (2022). *Emploi par secteur : Afrique Subsaharienne*
 - **BCEAO** (2023). *Rapport annuel sur les services financiers décentralisés*
 
 ---

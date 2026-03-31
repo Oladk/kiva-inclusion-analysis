@@ -1,10 +1,10 @@
 # ============================================================
-# NOTEBOOK 02 — Nettoyage & Feature Engineering
+# NOTEBOOK 02 : Nettoyage & Feature Engineering
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,33 +20,29 @@ ROOT      = Path("..")
 DATA_RAW  = ROOT / "data" / "raw"
 DATA_PROC = ROOT / "data" / "processed"
 
-print("✅ Imports OK")
+print(" Imports OK")
 
 
-# %% CELLULE 2 — Rechargement des données brutes
-print("⏳ Chargement...")
+# %% CELLULE 2 : Rechargement des données brutes
 loans = pd.read_csv(DATA_RAW / "kiva_loans.csv", low_memory=False)
-print(f"✅ {loans.shape[0]:,} lignes × {loans.shape[1]} colonnes")
+print(f" {loans.shape[0]:,} lignes × {loans.shape[1]} colonnes")
 
 
-# %% CELLULE 3 — Copie défensive
+# %% CELLULE 3 : Copie défensive
 # ─────────────────────────────────────────────────────────
-# POURQUOI copier ?
 # On ne modifie JAMAIS le DataFrame original.
 # Si une étape de nettoyage produit un résultat inattendu,
 # on peut toujours revenir à `loans` sans recharger le CSV.
 # ─────────────────────────────────────────────────────────
 clean = loans.copy()
-print(f"✅ Copie créée : {len(clean):,} lignes")
-print(f"   L'original 'loans' reste intact pour référence")
+print(f" Copie créée : {len(clean):,} lignes")
 
 
-# %% CELLULE 4 — Nettoyage des dates
+# %% CELLULE 4 : Nettoyage des dates
 # ─────────────────────────────────────────────────────────
-# POURQUOI convertir les dates maintenant ?
 # Les colonnes de dates arrivent comme des strings depuis le CSV.
 # Toute analyse temporelle (tendances, délais) nécessite
-# des vrais objets datetime — pas des chaînes de caractères.
+# des vrais objets datetime, pas des chaînes de caractères.
 # ─────────────────────────────────────────────────────────
 date_cols = ["posted_time", "disbursed_time", "funded_time", "date"]
 
@@ -63,19 +59,19 @@ clean["posted_month"] = clean["posted_time"].dt.month
 # NOTE ANALYTIQUE IMPORTANTE :
 # days_to_fund peut être NÉGATIF pour les prêts "pré-décaissés".
 # Kiva permet aux IMF de décaisser le prêt AVANT de le financer
-# sur la plateforme. Ce n'est pas une erreur — c'est une feature
-# du modèle Kiva. On garde ces valeurs et on les flagge.
+# sur la plateforme. Ce n'est pas une erreur : c'est une feature
+# du modèle Kiva. On garde donc ces valeurs et on les flagge.
 # ─────────────────────────────────────────────────────────
 clean["days_to_fund"] = (
     clean["funded_time"] - clean["posted_time"]
 ).dt.total_seconds() / 86400
 
 n_negative = (clean["days_to_fund"] < 0).sum()
-print(f"✅ Dates converties")
+print(f" Dates converties")
 print(f"   days_to_fund négatifs (pré-décaissés) : {n_negative:,} ({n_negative/len(clean)*100:.1f}%)")
 
 
-# %% CELLULE 5 — Gestion des valeurs manquantes
+# %% CELLULE 5 : Gestion des valeurs manquantes
 # ─────────────────────────────────────────────────────────
 # PHILOSOPHIE : documenter chaque décision
 # On ne supprime pas sans justifier.
@@ -88,14 +84,14 @@ journal = []  # On garde une trace de chaque décision
 # Décision : SUPPRIMER les lignes où le montant est manquant
 # Justification : le montant est la variable centrale.
 # L'imputer reviendrait à inventer la donnée principale.
-# Biais : < 0.5% des données — impact minimal
+# Biais : < 0.5% des données : impact minimal
 before = len(clean)
 clean = clean.dropna(subset=["funded_amount", "loan_amount"])
 n_dropped = before - len(clean)
 journal.append(f"Supprimées (montant manquant)  : {n_dropped:,} lignes")
 
 # ── region ───────────────────────────────────────────────
-# Décision : REMPLACER NaN par "Unknown" + créer un flag
+# Décision : REMPLACER NaN par "Unknown" et créer un flag
 # Justification : le pays est connu même si la région ne l'est pas.
 # Supprimer ces lignes ferait perdre des données valides.
 # Biais : les prêts "Unknown" sont probablement plus urbains
@@ -117,7 +113,7 @@ clean["use"] = clean["use"].fillna("Not specified")
 journal.append("use NaN → 'Not specified'")
 
 # ── funded_time ──────────────────────────────────────────
-# Décision : CONSERVER les NaN + créer un flag
+# Décision : CONSERVER les NaN et créer un flag
 # Justification : funded_time = NaN signifie soit que le prêt
 # n'a pas encore été entièrement financé, soit que la date
 # n'est pas renseignée. C'est une information utile en soi.
@@ -126,14 +122,14 @@ clean["is_unfunded"] = clean["funded_time"].isnull().astype(int)
 journal.append(f"funded_time NaN conservés (flag) : {n_unfunded:,} lignes")
 
 # ── Rapport des décisions ─────────────────────────────────
-print("\n📋 JOURNAL DES DÉCISIONS DE NETTOYAGE :")
+print("\n JOURNAL DES DÉCISIONS DE NETTOYAGE :")
 for decision in journal:
     print(f"   → {decision}")
 
-print(f"\n📐 Après nettoyage : {len(clean):,} lignes (était {len(loans):,})")
+print(f"\n Après nettoyage : {len(clean):,} lignes (était {len(loans):,})")
 
 
-# %% CELLULE 6 — Normalisation des textes
+# %% CELLULE 6 : Normalisation des textes
 # ─────────────────────────────────────────────────────────
 # POURQUOI normaliser les textes ?
 # "agriculture", "Agriculture", "AGRICULTURE" sont la même valeur.
@@ -146,15 +142,15 @@ for col in text_cols:
     if col in clean.columns:
         clean[col] = clean[col].str.strip().str.title()
 
-print("✅ Textes normalisés (strip + title case)")
+print(" Textes normalisés (strip + title case)")
 print(f"   Secteurs distincts : {clean['sector'].nunique()}")
 print(f"   Pays distincts     : {clean['country'].nunique()}")
 
 
-# %% CELLULE 7 — Feature Engineering : Genre
+# %% CELLULE 7 : Feature Engineering : Genre
 # ─────────────────────────────────────────────────────────
 # COMPLEXITÉ DE LA COLONNE borrower_genders :
-# Elle peut contenir :
+# Elle contient :
 #   "female"                     → 1 femme seule
 #   "male"                       → 1 homme seul
 #   "female, female, male"       → groupe mixte
@@ -223,15 +219,15 @@ def parse_gender(raw):
 gender_df = parse_gender(clean["borrower_genders"])
 clean = pd.concat([clean, gender_df], axis=1)
 
-print("✅ Variables genre créées")
-print("\n📊 Distribution gender_clean :")
+print(" Variables genre créées")
+print("\n Distribution gender_clean :")
 dist = clean["gender_clean"].value_counts(normalize=True).mul(100).round(1)
 for cat, pct in dist.items():
     bar = "█" * int(pct / 2)
     print(f"   {cat:<12} {bar:<35} {pct:>5.1f}%")
 
 
-# %% CELLULE 8 — Feature Engineering : Montants & Financement
+# %% CELLULE 8 : Feature Engineering : Montants & Financement
 # ─────────────────────────────────────────────────────────
 # VARIABLES CRÉÉES :
 #
@@ -271,17 +267,17 @@ clean["log_loan_amount"] = np.log1p(clean["loan_amount"])
 n_over_funded = (clean["funding_ratio"] > 1.01).sum()
 n_fully_funded = clean["is_fully_funded"].sum()
 
-print("✅ Variables montants créées")
+print(" Variables montants créées")
 print(f"\n   funding_ratio — min/max : {clean['funding_ratio'].min():.2f} / {clean['funding_ratio'].max():.2f}")
 print(f"   Sur-financés (>100%)    : {n_over_funded:,} ({n_over_funded/len(clean)*100:.1f}%)")
 print(f"   Entièrement financés    : {n_fully_funded:,} ({n_fully_funded/len(clean)*100:.1f}%)")
-print(f"\n📊 Répartition par taille de prêt (CGAP) :")
+print(f"\n Répartition par taille de prêt (CGAP) :")
 size_dist = clean["loan_size_category"].value_counts(normalize=True).mul(100).round(1)
 for cat, pct in size_dist.items():
     print(f"   {str(cat):<22} {pct:>5.1f}%")
 
 
-# %% CELLULE 9 — Feature Engineering : Géographie
+# %% CELLULE 9 : Feature Engineering : Géographie
 # ─────────────────────────────────────────────────────────
 # On crée deux variables géographiques :
 #
@@ -325,16 +321,16 @@ clean["sub_region"]    = clean["country_code"].apply(get_sub_region)
 n_ssa     = clean["is_subsaharan"].sum()
 n_pays    = clean[clean["is_subsaharan"]]["country"].nunique()
 
-print("✅ Variables géographiques créées")
+print(" Variables géographiques créées")
 print(f"\n   Prêts en Afrique Subsaharienne : {n_ssa:,} ({n_ssa/len(clean)*100:.1f}%)")
 print(f"   Pays ASS couverts              : {n_pays}")
-print(f"\n📊 Répartition par sous-région :")
+print(f"\n Répartition par sous-région :")
 sub_dist = clean[clean["is_subsaharan"]]["sub_region"].value_counts()
 for region, count in sub_dist.items():
     print(f"   {region:<25} {count:>7,} ({count/n_ssa*100:.1f}%)")
 
 
-# %% CELLULE 10 — Récapitulatif des nouvelles colonnes
+# %% CELLULE 10 : Récapitulatif des nouvelles colonnes
 nouvelles_cols = [c for c in clean.columns if c not in loans.columns]
 
 print(f"\n{'='*55}")
@@ -348,19 +344,19 @@ for col in sorted(nouvelles_cols):
     print(f"   {col:<25} | {dtype:<10} | unique: {n_unique:<6} | null: {n_null:,}")
 
 
-# %% CELLULE 11 — Export du dataset nettoyé
+# %% CELLULE 11 : Export du dataset nettoyé
 
 # Dataset global nettoyé
 out_global = DATA_PROC / "loans_clean.parquet"
 clean.to_parquet(out_global, index=False)
-print(f"✅ loans_clean.parquet sauvegardé")
+print(f" loans_clean.parquet sauvegardé")
 print(f"   {len(clean):,} lignes × {len(clean.columns)} colonnes")
 
 # Dataset ASS uniquement (pour les notebooks 03-06)
 loans_ssa = clean[clean["is_subsaharan"]].copy()
 out_ssa   = DATA_PROC / "loans_ssa.parquet"
 loans_ssa.to_parquet(out_ssa, index=False)
-print(f"\n✅ loans_ssa.parquet sauvegardé")
+print(f"\n loans_ssa.parquet sauvegardé")
 print(f"   {len(loans_ssa):,} prêts ASS")
 
 print(f"""
@@ -375,4 +371,3 @@ print(f"""
  Nouvelles variables : {len(nouvelles_cols)} colonnes ajoutées
 
 """)
-# %%

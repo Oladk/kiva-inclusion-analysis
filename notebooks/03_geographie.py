@@ -1,10 +1,10 @@
 # ============================================================
-# NOTEBOOK 03 — Analyse Géographique
+# NOTEBOOK 03 : Analyse Géographique
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,18 +23,18 @@ ROOT      = Path("..")
 DATA_PROC = ROOT / "data" / "processed"
 FIGURES   = ROOT / "reports" / "figures"
 
-print("✅ Imports OK")
+print(" Imports OK")
 
 
-# %% CELLULE 2 — Chargement
+# %% CELLULE 2 : Chargement
 loans = pd.read_parquet(DATA_PROC / "loans_ssa.parquet")
-print(f"✅ {len(loans):,} prêts ASS chargés")
+print(f" {len(loans):,} prêts ASS chargés")
 print(f"   Pays    : {loans['country'].nunique()}")
 print(f"   Secteurs: {loans['sector'].nunique()}")
 print(f"   Période : {loans['posted_year'].min():.0f} – {loans['posted_year'].max():.0f}")
 
 
-# %% CELLULE 3 — Volume et valeur par pays
+# %% CELLULE 3 : Volume et valeur par pays
 # ─────────────────────────────────────────────────────────
 # On construit la table principale de l'analyse géographique.
 # Chaque métrique a une interprétation spécifique :
@@ -62,23 +62,19 @@ country_stats["pct_of_ssa"]  = country_stats["n_loans"]  / len(loans) * 100
 country_stats["pct_volume"]  = country_stats["total_volume"] / loans["loan_amount"].sum() * 100
 country_stats["pct_female"]  = country_stats["pct_female"] * 100
 
-print("📊 Top 15 pays ASS par nombre de prêts :\n")
+print(" Top 15 pays ASS par nombre de prêts :\n")
 cols_display = ["country","sub_region","n_loans","pct_of_ssa","total_volume","median_amount","pct_female","n_partners"]
 print(country_stats[cols_display].head(15).round(2).to_string(index=False))
 
 
-# %% CELLULE 4 — Concentration géographique (Indice de Gini)
+# %% CELLULE 4 : Concentration géographique (Indice de Gini)
 # ─────────────────────────────────────────────────────────
-# POURQUOI calculer le Gini géographique ?
 # Le Gini mesure l'inégalité de distribution.
 # Ici : est-ce que les prêts sont équitablement répartis
 # entre les 28 pays, ou concentrés sur 3-4 pays ?
 #
 # Gini = 0  → distribution parfaitement égale
 # Gini = 1  → tout concentré sur un seul pays
-#
-# Référence : Gini des revenus en ASS ≈ 0.43-0.50
-# Si notre Gini géographique > 0.50 → plus inégal que les revenus
 # ─────────────────────────────────────────────────────────
 
 def gini(array):
@@ -95,7 +91,7 @@ country_stats_sorted = country_stats.sort_values("n_loans", ascending=False)
 country_stats_sorted["cumul_pct"] = country_stats_sorted["pct_of_ssa"].cumsum()
 n_for_80pct = (country_stats_sorted["cumul_pct"] <= 80).sum() + 1
 
-print(f"📊 CONCENTRATION GÉOGRAPHIQUE :")
+print(f" CONCENTRATION GÉOGRAPHIQUE :")
 print(f"   Gini (nombre de prêts) : {gini_loans:.3f}")
 print(f"   Gini (volume $)        : {gini_volume:.3f}")
 print(f"   Pays pour atteindre 80%: {n_for_80pct} pays sur {len(country_stats)}")
@@ -103,7 +99,7 @@ print(f"\n   → Les {n_for_80pct} premiers pays représentent 80% des prêts AS
 print(country_stats_sorted[["country","pct_of_ssa","cumul_pct"]].head(n_for_80pct).round(2).to_string(index=False))
 
 
-# %% CELLULE 5 — Visualisation : Top pays + sous-régions
+# %% CELLULE 5 : Visualisation : Top pays + sous-régions
 COLORS = {
     "Afrique de l'Ouest" : "#1A6B5C",
     "Afrique de l'Est"   : "#E8840B",
@@ -175,10 +171,10 @@ plt.tight_layout()
 plt.savefig(FIGURES / "03_geographic_distribution.png", dpi=150, bbox_inches="tight")
 plt.show()
 
-print("✅ Figure sauvegardée → reports/figures/03_geographic_distribution.png")
+print(" Figure sauvegardée → reports/figures/03_geographic_distribution.png")
 
 
-# %% CELLULE 6 — Normalisation par population adulte
+# %% CELLULE 6 : Normalisation par population adulte
 # ─────────────────────────────────────────────────────────
 # POURQUOI normaliser ?
 # Le Kenya a plus de prêts que le Bénin. Mais le Kenya a aussi
@@ -211,13 +207,13 @@ penetration = (
     [["country","sub_region","n_loans","prêts_p1000_adultes","pct_female"]]
 )
 
-print("📊 Pénétration Kiva (prêts pour 1 000 adultes) :\n")
+print(" Pénétration Kiva (prêts pour 1 000 adultes) :\n")
 print(penetration.head(15).round(2).to_string(index=False))
-print(f"\n⚠️  Population source : ONU 2020 — chiffres approximatifs")
+print(f"\n  Population source : ONU 2020 — chiffres approximatifs")
 print(f"   Ces taux sont indicatifs, pas des mesures précises")
 
 
-# %% CELLULE 7 — Visualisation : Pénétration vs % Femmes 
+# %% CELLULE 7 : Visualisation : Pénétration vs % Femmes 
 fig, ax = plt.subplots(figsize=(12, 7))
 
 # Fix : on merge uniquement total_volume depuis country_stats
@@ -270,17 +266,17 @@ ax.legend(handles=legend_patches + [
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 ax.text(0.01, -0.1,
-    "⚠️  Population ONU 2020 (approximations). Taux indicatifs.",
+    "  Population ONU 2020 (approximations). Taux indicatifs.",
     transform=ax.transAxes, fontsize=8, style="italic", color="#666"
 )
 
 plt.tight_layout()
 plt.savefig(FIGURES / "03_penetration_vs_genre.png", dpi=150, bbox_inches="tight")
 plt.show()
-print("✅ Figure sauvegardée")
+print(" Figure sauvegardée")
 
 
-# %% CELLULE 8 — Intégration données MPI
+# %% CELLULE 8 : Intégration données MPI
 # ─────────────────────────────────────────────────────────
 # L'IMP (Indice de Pauvreté Multidimensionnelle) mesure
 # la pauvreté au-delà du revenu : santé, éducation, niveau de vie.
@@ -296,11 +292,11 @@ print("✅ Figure sauvegardée")
 # ─────────────────────────────────────────────────────────
 
 mpi = pd.read_csv(DATA_PROC.parent / "raw" / "kiva_mpi_region_locations.csv")
-print(f"📂 MPI dataset : {mpi.shape}")
+print(f" MPI dataset : {mpi.shape}")
 print(mpi.head(3).to_string())
 
 
-# %% CELLULE 9 — Nettoyage des clés de jointure MPI
+# %% CELLULE 9 : Nettoyage des clés de jointure MPI
 mpi["country_j"] = mpi["country"].str.strip().str.title()
 mpi["region_j"]  = mpi["region"].str.strip().str.title()
 loans["country_j"] = loans["country"].str.strip().str.title()
@@ -326,14 +322,14 @@ loans_mpi["mpi_source"] = np.where(loans_mpi["MPI"].notna(), "region", "country_
 match_exact = (loans_mpi["mpi_source"] == "region").mean() * 100
 match_total = loans_mpi["MPI_final"].notna().mean() * 100
 
-print(f"\n✅ Jointure MPI terminée :")
+print(f"\n Jointure MPI terminée :")
 print(f"   Match exact (région)    : {match_exact:.1f}%")
 print(f"   Match total (+ médiane) : {match_total:.1f}%")
 print(f"   Sans MPI                : {100-match_total:.1f}%")
-print(f"\n⚠️  {100-match_exact:.1f}% utilisent la médiane pays → disparités intra-pays atténuées")
+print(f"\n  {100-match_exact:.1f}% utilisent la médiane pays → disparités intra-pays atténuées")
 
 
-# %% CELLULE 10 — Corrélation MPI ↔ Volume de financement
+# %% CELLULE 10 : Corrélation MPI ↔ Volume de financement
 # ─────────────────────────────────────────────────────────
 # C'est LA question centrale de ce notebook :
 # Le financement Kiva atteint-il les régions les plus pauvres ?
@@ -365,19 +361,19 @@ print(f"📊 TEST : Corrélation IMP ↔ Volume de prêts")
 print(f"   H0 : aucune relation monotone entre pauvreté et financement")
 print(f"\n   Corrélation Spearman : ρ = {rho:.3f}")
 print(f"   p-value              : {p_val:.4f}")
-print(f"   Significatif (α=0.05): {'OUI ✅' if p_val < 0.05 else 'NON ❌'}")
+print(f"   Significatif (α=0.05): {'OUI ' if p_val < 0.05 else 'NON ❌'}")
 
 if rho > 0.1 and p_val < 0.05:
-    interpretation = "POSITIVE et significative → + un pays est pauvre, + il est financé ✅"
+    interpretation = "POSITIVE et significative → + un pays est pauvre, + il est financé "
 elif rho < -0.1 and p_val < 0.05:
-    interpretation = "NÉGATIVE et significative → + un pays est pauvre, - il est financé ⚠️"
+    interpretation = "NÉGATIVE et significative → + un pays est pauvre, - il est financé "
 else:
     interpretation = "Pas de relation claire → le financement n'est pas corrélé à la pauvreté"
 
 print(f"\n   → Interprétation : {interpretation}")
 
 
-# %% CELLULE 11 — Visualisation : MPI vs Financement
+# %% CELLULE 11 : Visualisation : MPI vs Financement
 fig, ax = plt.subplots(figsize=(11, 7))
 
 for _, row in country_mpi_agg.iterrows():
@@ -422,7 +418,7 @@ ax.legend(handles=legend_patches + [
 ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 ax.text(0.01, -0.1,
-    "⚠️  IMP source : Kiva MPI dataset. Jointure par région (médiane pays si non-matchée).",
+    "  IMP source : Kiva MPI dataset. Jointure par région (médiane pays si non-matchée).",
     transform=ax.transAxes, fontsize=8, style="italic", color="#666"
 )
 
@@ -431,10 +427,10 @@ plt.savefig(FIGURES / "03_mpi_vs_financement.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 
-# %% CELLULE 12 — Export final
+# %% CELLULE 12 : Export final
 loans_mpi.to_parquet(DATA_PROC / "loans_ssa_mpi.parquet", index=False)
 
-print(f"✅ loans_ssa_mpi.parquet sauvegardé")
+print(f" loans_ssa_mpi.parquet sauvegardé")
 print(f"   {len(loans_mpi):,} prêts ASS avec MPI")
 print(f"""
 {'='*55}
@@ -450,4 +446,3 @@ print(f"""
    → data/processed/loans_ssa_mpi.parquet
 
 """)
-# %%

@@ -1,10 +1,10 @@
 # ============================================================
-# NOTEBOOK 04 — Analyse Sectorielle
+# NOTEBOOK 04 : Analyse Sectorielle
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,16 +23,16 @@ ROOT      = Path("..")
 DATA_PROC = ROOT / "data" / "processed"
 FIGURES   = ROOT / "reports" / "figures"
 
-print("✅ Imports OK")
+print(" Imports OK")
 
 
-# %% CELLULE 2 — Chargement
+# %% CELLULE 2 : Chargement
 loans = pd.read_parquet(DATA_PROC / "loans_ssa_mpi.parquet")
-print(f"✅ {len(loans):,} prêts ASS chargés")
+print(f" {len(loans):,} prêts ASS chargés")
 print(f"   Secteurs distincts : {loans['sector'].nunique()}")
 
 
-# %% CELLULE 3 — Distribution sectorielle
+# %% CELLULE 3 : Distribution sectorielle
 # ─────────────────────────────────────────────────────────
 # On calcule deux métriques complémentaires :
 # pct_loans  → part en NOMBRE (combien de prêts ?)
@@ -64,12 +64,12 @@ sector_stats["pct_volume"]  = sector_stats["total_volume"]  / loans["loan_amount
 sector_stats["pct_female"]  = sector_stats["pct_female"]    * 100
 sector_stats["vol_per_loan"]= sector_stats["total_volume"]  / sector_stats["n_loans"]
 
-print("📊 Distribution sectorielle — ASS :\n")
+print(" Distribution sectorielle — ASS :\n")
 cols = ["sector","n_loans","pct_loans","pct_volume","median_amount","pct_female","avg_mpi"]
 print(sector_stats[cols].round(2).to_string(index=False))
 
 
-# %% CELLULE 4 — Visualisation : distribution sectorielle
+# %% CELLULE 4 : Visualisation : distribution sectorielle
 COLORS_SECTOR = [
     "#1A6B5C","#E8840B","#2E86AB","#C73E1D",
     "#F7B731","#6C5CE7","#00B894","#D63031",
@@ -136,10 +136,10 @@ axes[1].spines["right"].set_visible(False)
 plt.tight_layout()
 plt.savefig(FIGURES / "04_sector_distribution.png", dpi=150, bbox_inches="tight")
 plt.show()
-print("✅ Figure sauvegardée → 04_sector_distribution.png")
+print(" Figure sauvegardée → 04_sector_distribution.png")
 
 
-# %% CELLULE 5 — Expected vs Actual (graphique clé pour Kintésens)
+# %% CELLULE 5 : Expected vs Actual (graphique clé pour Kintésens)
 # ─────────────────────────────────────────────────────────
 # CONCEPT :
 # Si le microcrédit était parfaitement aligné sur les besoins
@@ -190,7 +190,7 @@ comparison["gap_label"] = comparison["gap"].apply(
 )
 comparison = comparison.sort_values("gap", ascending=False)
 
-print("📊 EXPECTED vs ACTUAL — Allocation sectorielle :")
+print(" EXPECTED vs ACTUAL : Allocation sectorielle :")
 print(f"{'Secteur':<20} {'Kiva%':>8} {'Emploi%':>9} {'Écart':>8}  Signal")
 print("-" * 60)
 for _, row in comparison.iterrows():
@@ -198,7 +198,7 @@ for _, row in comparison.iterrows():
     print(f"  {row['sector']:<18} {row['pct_loans']:>7.1f}% {row['expected']:>8.1f}% {row['gap_label']:>8}  {signal}")
 
 
-# %% CELLULE 6 — Visualisation Expected vs Actual
+# %% CELLULE 6 : Visualisation Expected vs Actual
 fig, ax = plt.subplots(figsize=(12, 8))
 
 sectors_sorted = comparison.sort_values("gap")
@@ -227,21 +227,21 @@ ax.spines["top"].set_visible(False)
 ax.spines["right"].set_visible(False)
 
 ax.text(0.01, -0.09,
-    "⚠️  Benchmark emploi : Banque Mondiale / OIT 2022 (estimations régionales ASS).",
+    "  Benchmark emploi : Banque Mondiale / OIT 2022 (estimations régionales ASS).",
     transform=ax.transAxes, fontsize=8, style="italic", color="#666"
 )
 
 plt.tight_layout()
 plt.savefig(FIGURES / "04_expected_vs_actual.png", dpi=150, bbox_inches="tight")
 plt.show()
-print("✅ Figure sauvegardée → 04_expected_vs_actual.png")
+print(" Figure sauvegardée → 04_expected_vs_actual.png")
 
 
-# %% CELLULE 7 — Heatmap : Top 10 pays × secteurs
+# %% CELLULE 7 : Heatmap : Top 10 pays × secteurs
 # ─────────────────────────────────────────────────────────
 # Ce graphique répond à : "Y a-t-il des spécialisations
 # sectorielles par pays ?"
-# Kenya vs Nigeria vs Sénégal — même profil sectoriel ?
+# Kenya vs Nigeria vs Sénégal : même profil sectoriel ?
 # ─────────────────────────────────────────────────────────
 
 top10_pays = (
@@ -284,13 +284,13 @@ plt.yticks(rotation=0)
 plt.tight_layout()
 plt.savefig(FIGURES / "04_heatmap_pays_secteur.png", dpi=150, bbox_inches="tight")
 plt.show()
-print("✅ Figure sauvegardée → 04_heatmap_pays_secteur.png")
+print(" Figure sauvegardée → 04_heatmap_pays_secteur.png")
 
 
-# %% CELLULE 8 — Analyse Agriculture (secteur dominant)
+# %% CELLULE 8 : Analyse Agriculture (secteur dominant)
 agri = loans[loans["sector"].str.lower() == "agriculture"].copy()
 
-print(f"🌾 Focus Agriculture :")
+print(f" Focus Agriculture :")
 print(f"   Prêts     : {len(agri):,} ({len(agri)/len(loans)*100:.1f}% des prêts ASS)")
 print(f"   Volume    : ${agri['loan_amount'].sum()/1e6:.1f}M")
 print(f"   Médiane   : ${agri['loan_amount'].median():,.0f}")
@@ -303,7 +303,7 @@ for act, count in agri_act.items():
     print(f"   {act:<35} {count:>6,} ({count/len(agri)*100:.1f}%)")
 
 # Saisonnalité : distribution par mois
-print(f"\n📅 Distribution mensuelle des prêts agricoles :")
+print(f"\n Distribution mensuelle des prêts agricoles :")
 monthly_agri = agri["posted_month"].value_counts().sort_index()
 mois = ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"]
 for m, count in monthly_agri.items():
@@ -313,7 +313,7 @@ for m, count in monthly_agri.items():
         print(f"   {mois[int(m)-1]} {bar:<27} {pct:.1f}%")
 
 
-# %% CELLULE 9 — Test de saisonnalité (Chi²)
+# %% CELLULE 9 : Test de saisonnalité (Chi²)
 # ─────────────────────────────────────────────────────────
 # H0 : Les prêts agricoles sont uniformément distribués
 #      sur les 12 mois (distribution uniforme)
@@ -330,7 +330,7 @@ chi2_stat, p_chi2 = stats.chisquare(monthly_counts.values, f_exp=expected_unifor
 print(f"📊 TEST DE SAISONNALITÉ AGRICOLE (χ²) :")
 print(f"   H0 : distribution mensuelle uniforme")
 print(f"   χ² = {chi2_stat:.2f}, p = {p_chi2:.6f}")
-print(f"   Conclusion : {'H0 REJETÉE → saisonnalité significative ✅' if p_chi2 < 0.05 else 'H0 non rejetée → pas de saisonnalité détectée'}")
+print(f"   Conclusion : {'H0 REJETÉE → saisonnalité significative ' if p_chi2 < 0.05 else 'H0 non rejetée → pas de saisonnalité détectée'}")
 
 if p_chi2 < 0.05:
     pic_mois   = mois[int(monthly_counts.idxmax()) - 1]
@@ -340,13 +340,13 @@ if p_chi2 < 0.05:
     print(f"   Ratio pic/creux : {monthly_counts.max()/monthly_counts.min():.2f}x")
 
 
-# %% CELLULE 10 — Synthèse sectorielle
+# %% CELLULE 10 : Synthèse sectorielle
 print(f"""
 {'='*60}
- SYNTHÈSE — NOTEBOOK 04
+ SYNTHÈSE : NOTEBOOK 04
 {'='*60}
 
- FINDING #3 — Adéquation sectorielle :
+ FINDING #3 : Adéquation sectorielle :
 """)
 
 # Calculer les principaux écarts
@@ -368,4 +368,3 @@ print(f"""
    → 04_heatmap_pays_secteur.png
 
 """)
-# %%

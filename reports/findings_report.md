@@ -1,9 +1,9 @@
 # Analyse de l'Inclusion Financière en Afrique Subsaharienne
-### Données Kiva.org — 171 391 prêts | 28 pays | 2014–2019
+### Données Kiva.org : 171 391 prêts | 28 pays | 2014–2019
 
 **Auteur :** Ronald Dossou-Kohi | ISE Statisticien | Data Analyst  
 **Outils :** Python · SQL · Power BI  
-**Données :** [Kiva Data Science for Good — Kaggle](https://www.kaggle.com/datasets/kiva/data-science-for-good-kiva-crowdfunding)
+**Données :** [Kiva Data Science for Good : Kaggle](https://www.kaggle.com/datasets/kiva/data-science-for-good-kiva-crowdfunding)
 
 ---
 
@@ -35,18 +35,18 @@ pro-pauvres, pro-genre et sectoriellement alignée sur les besoins économiques 
 
 ## 7 Findings
 
-### F1 — Distribution géographique très concentrée
-**Gini géographique = 0.704** — plus inégal que la distribution des revenus
+### F1 : Distribution géographique très concentrée
+**Gini géographique = 0.704** : plus inégal que la distribution des revenus
 en ASS (~0.45). 9 pays sur 28 concentrent **80% des prêts**.
 L'accès au microcrédit Kiva dépend de la présence institutionnelle
 des Field Partners, pas des besoins des populations.
 
-> *Implication : Les 20 pays absents ne manquent pas de pauvreté —
+> *Implication : Les 20 pays absents ne manquent pas de pauvreté :
 > ils manquent d'IMF partenaires.*
 
 ---
 
-### F2 — Aucune corrélation pauvreté-financement
+### F2 : Aucune corrélation pauvreté-financement
 Corrélation Spearman entre IMP moyen et volume de prêts :
 **ρ = -0.11, p = 0.61 (non significatif)**.
 Le financement Kiva en ASS est géographiquement neutre par rapport
@@ -57,9 +57,9 @@ Le financement Kiva en ASS est géographiquement neutre par rapport
 
 ---
 
-### F3 — Agriculture structurellement sous-financée
+### F3 : Agriculture structurellement sous-financée
 L'agriculture emploie **54% des actifs** en ASS mais ne capte que
-**32.5% des prêts Kiva** — un gap de **-21.5 points**.
+**32.5% des prêts Kiva**; donc un gap de **-21.5 points**.
 
 | Secteur | % Prêts Kiva | % Emploi ASS | Écart |
 |---------|-------------|--------------|-------|
@@ -72,7 +72,7 @@ L'agriculture emploie **54% des actifs** en ASS mais ne capte que
 
 ---
 
-### F4 — Saisonnalité agricole significative
+### F4 : Saisonnalité agricole significative
 Les prêts agricoles ne sont pas uniformément distribués sur l'année.
 **Pic en mars** (préparation des semailles), creux en fin d'année.
 Test χ² hautement significatif (p < 0.001).
@@ -82,9 +82,9 @@ Test χ² hautement significatif (p < 0.001).
 
 ---
 
-### F5 — Gap de genre faible en volume
+### F5 : Gap de genre faible en volume
 Les femmes représentent **70.1% des prêts** en nombre
-et **70.7% du volume** total — un écart de seulement **0.6 points**.
+et **70.7% du volume** total, ce qui fait un écart de seulement **0.6 points**.
 Résultat contre-intuitif : contrairement à la narrative habituelle,
 Kiva ASS alloue le capital de façon quasi-équitable en volume.
 
@@ -98,18 +98,18 @@ significatif (Mann-Whitney, p < 0.001) mais d'**effet négligeable
 
 ---
 
-### F6 — Prêts féminins financés 44% plus vite
+### F6 : Prêts féminins financés 44% plus vite
 Délai médian de financement : **9.2 jours (femmes) vs 13.3 jours (hommes)**.
 Les prêts féminins sont narrativement plus attractifs pour les
 prêteurs Kiva internationaux.
 
-> *Implication : Biais de plateforme favorable aux femmes —
+> *Implication : Biais de plateforme favorable aux femmes :
 > avantage sur Kiva qui ne se reproduit pas nécessairement
 > dans le secteur financier formel.*
 
 ---
 
-### F7 — Taille du prêt = déterminant #1 du financement
+### F7 : Taille du prêt = déterminant #1 du financement
 Modèle Random Forest : **AUC-ROC = 0.866**.
 La feature la plus importante est `log_loan_amount` :
 les petits prêts se financent systématiquement plus facilement et
@@ -152,7 +152,7 @@ Classification par profil d'impact :
 | 20 pays absents (sans Field Partners) | Fort | Dans l'analyse géographique |
 | `is_fully_funded` ≠ remboursement réel | Critique | Dans la modélisation |
 | IMP : match exact = 9.2% seulement | Modéré | Dans l'analyse MPI |
-| Données 2014-2019 — pas de données récentes | Modéré | Dans les recommandations |
+| Données 2014-2019 : pas de données récentes | Modéré | Dans les recommandations |
 
 ---
 
@@ -190,7 +190,6 @@ Git/GitHub      Versioning complet du projet
 ```
 kiva-inclusion-analysis/
 ├── notebooks/          # 7 notebooks Python séquentiels
-├── src/                # Modules réutilisables (loader, preprocessing, viz)
 ├── data/processed/     # Données nettoyées + exports Power BI
 ├── reports/figures/    # 12+ visualisations exportées
 ├── sql/                # Requêtes analytiques SQL

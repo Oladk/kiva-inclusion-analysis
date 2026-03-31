@@ -1,14 +1,14 @@
 # ============================================================
-# NOTEBOOK 01 — Première Exploration des Données Kiva
+# NOTEBOOK 01 : Première Exploration des Données Kiva
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 # Pour exécuter cellule par cellule dans VS Code :
-# Installe l'extension "Jupyter" de Microsoft
+# Installez l'extension "Jupyter" de Microsoft
 # Chaque bloc "# %%" est une cellule exécutable (Ctrl+Enter)
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,30 +30,30 @@ print(f"   pandas  : {pd.__version__}")
 print(f"   numpy   : {np.__version__}")
 
 
-# %% CELLULE 2 — Chargement (peut prendre 15-20 secondes)
+# %% CELLULE 2 : Chargement (peut prendre 15-20 secondes)
 print("⏳ Chargement de kiva_loans.csv...")
 
 loans = pd.read_csv(DATA_RAW / "kiva_loans.csv", low_memory=False)
 
-print(f"✅ Chargé : {loans.shape[0]:,} lignes × {loans.shape[1]} colonnes")
+print(f"Chargé : {loans.shape[0]:,} lignes × {loans.shape[1]} colonnes")
 
 
-# %% CELLULE 3 — Structure de base
+# %% CELLULE 3 : Structure de base
 print("=" * 55)
 print(" STRUCTURE DU DATASET")
 print("=" * 55)
 
-print(f"\n📐 Dimensions    : {loans.shape[0]:,} prêts × {loans.shape[1]} variables")
-print(f"💾 Mémoire       : {loans.memory_usage(deep=True).sum() / 1e6:.1f} Mo")
-print(f"\n📋 Colonnes :\n")
+print(f"\n Dimensions    : {loans.shape[0]:,} prêts × {loans.shape[1]} variables")
+print(f" Mémoire       : {loans.memory_usage(deep=True).sum() / 1e6:.1f} Mo")
+print(f"\n Colonnes :\n")
 print(loans.dtypes.to_string())
 
 
-# %% CELLULE 4 — Aperçu des premières lignes
+# %% CELLULE 4 : Aperçu des premières lignes
 loans.head(3)
 
 
-# %% CELLULE 5 — Valeurs manquantes
+# %% CELLULE 5 : Valeurs manquantes
 print("=" * 55)
 print(" VALEURS MANQUANTES")
 print("=" * 55)
@@ -66,7 +66,7 @@ missing = pd.DataFrame({
 print(missing[missing["n_manquants"] > 0].to_string())
 
 
-# %% CELLULE 6 — Statistiques descriptives (variables numériques)
+# %% CELLULE 6 : Statistiques descriptives (variables numériques)
 print("=" * 55)
 print(" STATISTIQUES DESCRIPTIVES")
 print("=" * 55)
@@ -76,7 +76,7 @@ num_stats["cv_%"] = (num_stats["std"] / num_stats["mean"] * 100).round(1)
 print(num_stats[["count","mean","std","min","25%","50%","75%","max","cv_%"]].round(2).to_string())
 
 
-# %% CELLULE 7 — Distribution des montants de prêts
+# %% CELLULE 7 : Distribution des montants de prêts
 fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 fig.suptitle("Distribution des Montants de Prêts — Kiva Global", 
              fontsize=13, fontweight="bold")
@@ -112,7 +112,7 @@ plt.savefig(ROOT / "reports" / "figures" / "01_loan_amount_distribution.png",
             dpi=150, bbox_inches="tight")
 plt.show()
 
-print(f"\n📊 Statistiques — loan_amount :")
+print(f"\n Statistiques — loan_amount :")
 print(f"   Médiane        : ${loan_data.median():>10,.0f}")
 print(f"   Moyenne        : ${loan_data.mean():>10,.0f}")
 print(f"   Ratio moy/méd  : {loan_data.mean()/loan_data.median():>10.2f}x")
@@ -120,7 +120,7 @@ print(f"   P25 / P75      :  ${loan_data.quantile(.25):,.0f}  /  ${loan_data.qua
 print(f"   P99            : ${loan_data.quantile(.99):>10,.0f}")
 
 
-# %% CELLULE 8 — Top pays
+# %% CELLULE 8 : Top pays
 print("=" * 55)
 print(" COUVERTURE GÉOGRAPHIQUE")
 print("=" * 55)
@@ -128,7 +128,7 @@ print("=" * 55)
 country_counts = loans["country"].value_counts()
 total          = len(loans)
 
-print(f"\n🌍 Nombre de pays distincts : {loans['country'].nunique()}")
+print(f"\n Nombre de pays distincts : {loans['country'].nunique()}")
 print(f"\nTop 20 pays par nombre de prêts :\n")
 
 top20 = pd.DataFrame({
@@ -139,7 +139,7 @@ top20 = pd.DataFrame({
 print(top20.to_string())
 
 
-# %% CELLULE 9 — Secteurs d'activité
+# %% CELLULE 9 : Secteurs d'activité
 print("=" * 55)
 print(" SECTEURS D'ACTIVITÉ")
 print("=" * 55)
@@ -147,13 +147,13 @@ print("=" * 55)
 sector_counts = loans["sector"].value_counts()
 sector_pct    = (sector_counts / total * 100).round(2)
 
-print(f"\n📊 {loans['sector'].nunique()} secteurs distincts\n")
+print(f"\n {loans['sector'].nunique()} secteurs distincts\n")
 for sector, pct in sector_pct.items():
     bar = "█" * int(pct / 1.5)
     print(f"  {sector:<22} {bar:<30} {pct:>5.1f}%")
 
 
-# %% CELLULE 10 — Variable genre (aperçu brut)
+# %% CELLULE 10 : Variable genre (aperçu brut)
 print("=" * 55)
 print(" VARIABLE GENRE (brut)")
 print("=" * 55)
@@ -165,7 +165,7 @@ print(f"\nValeurs manquantes : {loans['borrower_genders'].isnull().sum():,}")
 print(f"Taux manquants     : {loans['borrower_genders'].isnull().mean()*100:.1f}%")
 
 
-# %% CELLULE 11 — Temporalité
+# %% CELLULE 11 : Temporalité
 print("=" * 55)
 print(" COUVERTURE TEMPORELLE")
 print("=" * 55)
@@ -181,16 +181,15 @@ annual = loans.groupby("posted_year").agg(
 
 annual["croissance_%"] = annual["n_prêts"].pct_change() * 100
 
-print(f"\n📅 Première publication : {loans['posted_time'].min()}")
+print(f"\n Première publication : {loans['posted_time'].min()}")
 print(f"   Dernière publication  : {loans['posted_time'].max()}")
-print(f"\n📊 Volume par année :\n")
+print(f"\n Volume par année :\n")
 print(annual.round(1).to_string())
 
 
-# %% CELLULE 12 — Sauvegarde des stats descriptives
+# %% CELLULE 12 : Sauvegarde des stats descriptives
 output_path = ROOT / "data" / "processed" / "01_stats_descriptives.csv"
 loans.describe(include="all").T.to_csv(output_path)
 
-print(f"✅ Stats descriptives sauvegardées → {output_path}")
-print(f"\n🚀 Notebook 01 terminé.")
-# %%
+print(f" Stats descriptives sauvegardées → {output_path}")
+print(f"\n Notebook 01 terminé.")

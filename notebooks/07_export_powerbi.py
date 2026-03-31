@@ -1,10 +1,10 @@
 # ============================================================
-# NOTEBOOK 07 — Export des données pour Power BI
+# NOTEBOOK 07 : Export des données pour Power BI
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import pandas as pd
 import numpy as np
 import warnings
@@ -17,16 +17,16 @@ DATA_PROC = ROOT / "data" / "processed"
 DATA_PBI  = ROOT / "data" / "processed" / "powerbi"
 DATA_PBI.mkdir(parents=True, exist_ok=True)
 
-print("✅ Imports OK")
+print(" Imports OK")
 print(f"   Export vers : {DATA_PBI}")
 
 
-# %% CELLULE 2 — Chargement
+# %% CELLULE 2 : Chargement
 loans = pd.read_parquet(DATA_PROC / "loans_ssa_mpi.parquet")
-print(f"✅ {len(loans):,} prêts ASS chargés")
+print(f" {len(loans):,} prêts ASS chargés")
 
 
-# %% CELLULE 3 — Table FAITS : un prêt par ligne
+# %% CELLULE 3 : Table FAITS : un prêt par ligne
 # ─────────────────────────────────────────────────────────
 # Power BI fonctionne avec un modèle en étoile :
 #   - 1 table de FAITS (les prêts)
@@ -66,11 +66,11 @@ fact_loans["loan_size_category"] = fact_loans["loan_size_category"].astype(str)
 # Nettoyer les valeurs infinies
 fact_loans = fact_loans.replace([np.inf, -np.inf], np.nan)
 
-print(f"✅ Table FAITS : {len(fact_loans):,} lignes × {len(fact_loans.columns)} colonnes")
+print(f" Table FAITS : {len(fact_loans):,} lignes × {len(fact_loans.columns)} colonnes")
 print(f"   Taille mémoire : {fact_loans.memory_usage(deep=True).sum()/1e6:.1f} Mo")
 
 
-# %% CELLULE 4 — Table DIMENSION : Pays
+# %% CELLULE 4 : Table DIMENSION : Pays
 dim_country = (
     loans
     .groupby(["country","country_code","sub_region"])
@@ -102,10 +102,10 @@ dim_country["prets_p1000_adultes"] = (
     dim_country["n_loans"] / (dim_country["pop_adultes_M"] * 1000)
 ).round(2)
 
-print(f"✅ Table PAYS : {len(dim_country)} pays")
+print(f" Table PAYS : {len(dim_country)} pays")
 
 
-# %% CELLULE 5 — Table DIMENSION : Secteur
+# %% CELLULE 5 : Table DIMENSION : Secteur
 EMPLOI_BENCHMARK = {
     "Agriculture":54.0,"Food":10.0,"Retail":8.0,"Arts":4.0,
     "Services":7.0,"Education":3.0,"Health":2.0,"Housing":2.0,
@@ -130,10 +130,10 @@ dim_sector["pct_kiva"]      = dim_sector["n_loans"] / len(loans) * 100
 dim_sector["pct_emploi"]    = dim_sector["sector"].map(EMPLOI_BENCHMARK).fillna(0)
 dim_sector["gap_allocation"] = dim_sector["pct_kiva"] - dim_sector["pct_emploi"]
 
-print(f"✅ Table SECTEUR : {len(dim_sector)} secteurs")
+print(f" Table SECTEUR : {len(dim_sector)} secteurs")
 
 
-# %% CELLULE 6 — Table DIMENSION : Field Partners
+# %% CELLULE 6 : Table DIMENSION : Field Partners
 dim_partner = (
     loans[loans["partner_id"].notna()]
     .groupby("partner_id")
@@ -172,12 +172,12 @@ def profil_partner(row):
 
 dim_partner["profil"] = dim_partner.apply(profil_partner, axis=1)
 
-print(f"✅ Table FIELD PARTNERS : {len(dim_partner)} partenaires")
+print(f" Table FIELD PARTNERS : {len(dim_partner)} partenaires")
 print(f"\n   Répartition des profils :")
 print(dim_partner["profil"].value_counts().to_string())
 
 
-# %% CELLULE 7 — Table DIMENSION : Temporelle
+# %% CELLULE 7 : Table DIMENSION : Temporelle
 dim_temps = (
     loans[loans["posted_year"].notna()]
     .groupby(["posted_year","posted_month"])
@@ -200,10 +200,10 @@ mois_noms = {1:"Janvier",2:"Février",3:"Mars",4:"Avril",5:"Mai",6:"Juin",
              7:"Juillet",8:"Août",9:"Septembre",10:"Octobre",11:"Novembre",12:"Décembre"}
 dim_temps["mois_nom"] = dim_temps["posted_month"].map(mois_noms)
 
-print(f"✅ Table TEMPORELLE : {len(dim_temps)} combinaisons année-mois")
+print(f" Table TEMPORELLE : {len(dim_temps)} combinaisons année-mois")
 
 
-# %% CELLULE 8 — Table KPI SYNTHÈSE (pour les cartes Power BI)
+# %% CELLULE 8 : Table KPI SYNTHÈSE (pour les cartes Power BI)
 kpi_data = {
     "KPI"    : [
         "Total Prêts ASS",
@@ -242,11 +242,22 @@ kpi_data = {
     ]
 }
 dim_kpi = pd.DataFrame(kpi_data)
-print(f"✅ Table KPI : {len(dim_kpi)} indicateurs")
+print(f" Table KPI : {len(dim_kpi)} indicateurs")
 print(dim_kpi.to_string(index=False))
 
+# %% Correction booléens avant export
+# Power BI Windows gère mal les True/False dans les CSV
+# On convertit explicitement en 0/1
 
-# %% CELLULE 9 — Export CSV pour Power BI
+bool_cols = ["is_female", "is_fully_funded", "is_group", "is_unfunded", 
+             "is_undisbursed", "region_missing"]
+
+for col in bool_cols:
+    if col in fact_loans.columns:
+        fact_loans[col] = fact_loans[col].map({True: 1, False: 0, "True": 1, "False": 0})
+        print(f" {col} → 0/1")
+
+# %% CELLULE 9 : Export CSV pour Power BI
 exports = {
     "fact_loans.csv"   : fact_loans,
     "dim_country.csv"  : dim_country,
@@ -256,12 +267,12 @@ exports = {
     "dim_kpi.csv"      : dim_kpi,
 }
 
-print(f"\n💾 Export des tables Power BI :")
+print(f"\n Export des tables Power BI :")
 for filename, df in exports.items():
     path = DATA_PBI / filename
     df.to_csv(path, index=False, encoding="utf-8-sig")
     size_kb = path.stat().st_size / 1024
-    print(f"   ✅ {filename:<25} {len(df):>7,} lignes  {size_kb:>8.1f} Ko")
+    print(f"    {filename:<25} {len(df):>7,} lignes  {size_kb:>8.1f} Ko")
 
 print(f"\n{'='*55}")
 print(f" EXPORT TERMINÉ")
@@ -273,4 +284,25 @@ print(f"   2. dim_country.csv  → Onglet géographie")
 print(f"   3. dim_sector.csv   → Onglet sectoriel")
 print(f"   4. dim_partner.csv  → Onglet field partners")
 print(f"   5. dim_kpi.csv      → Cartes KPI (onglet exécutif)")
-# %%
+
+# %% CELLULE 10 : Réexport CSV compatible Windows/Power BI
+# Séparateur : point-virgule (standard Windows FR)
+# Décimale   : virgule (standard Windows FR)
+# Encodage   : utf-8-sig (BOM pour Excel/Power BI Windows)
+
+print(" Réexport des tables en format compatible Power BI Windows...")
+
+for filename, df in exports.items():
+    path = DATA_PBI / filename
+    df.to_csv(
+        path,
+        index=False,
+        encoding="utf-8-sig",   # BOM pour Windows
+        sep=";",                 # séparateur point-virgule
+        decimal=","              # décimale virgule (Windows FR)
+    )
+    size_kb = path.stat().st_size / 1024
+    print(f" {filename:<25} {size_kb:>8.1f} Ko")
+
+print("\n Export terminé : format Windows FR (sep=; decimal=,)")
+

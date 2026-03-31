@@ -1,10 +1,10 @@
 # ============================================================
-# NOTEBOOK 08 — Création base SQLite & Requêtes Analytiques
+# NOTEBOOK 08 : Création base SQLite & Requêtes Analytiques
 # Projet : Analyse Inclusion Financière ASS
 # Auteur : Ronald Dossou-Kohi
 # ============================================================
 
-# %% CELLULE 1 — Imports
+# %% CELLULE 1 : Imports
 import sqlite3
 import pandas as pd
 import numpy as np
@@ -18,11 +18,11 @@ DATA_PROC = ROOT / "data" / "processed"
 SQL_DIR   = ROOT / "sql"
 SQL_DIR.mkdir(exist_ok=True)
 
-print("✅ Imports OK")
+print(" Imports OK")
 
 
-# %% CELLULE 2 — Créer la base SQLite
-print("⏳ Création de la base SQLite...")
+# %% CELLULE 2 : Créer la base SQLite
+print(" Création de la base SQLite...")
 
 conn = sqlite3.connect(DATA_PROC / "kiva_ssa.db")
 
@@ -45,7 +45,7 @@ sector.to_sql("dim_sector",   conn, if_exists="replace", index=False)
 partner.to_sql("dim_partner", conn, if_exists="replace", index=False)
 
 conn.commit()
-print("✅ Base SQLite créée → data/processed/kiva_ssa.db")
+print(" Base SQLite créée → data/processed/kiva_ssa.db")
 
 # Vérification
 cursor = conn.cursor()
@@ -60,7 +60,7 @@ for t in tables:
 conn.close()
 
 
-# %% CELLULE 3 — Exécuter et afficher les requêtes SQL
+# %% CELLULE 3 : Exécuter et afficher les requêtes SQL
 # On relit le fichier SQL et on exécute chaque requête
 conn = sqlite3.connect(DATA_PROC / "kiva_ssa.db")
 
@@ -87,7 +87,7 @@ for query in queries:
         result = pd.read_sql_query(sql, conn)
         print(result.to_string(index=False))
     except Exception as e:
-        print(f"   ❌ Erreur : {e}")
+        print(f" Erreur : {e}")
 
 conn.close()
-print(f"\n✅ Toutes les requêtes exécutées")
+print(f"\n Toutes les requêtes exécutées")
