@@ -1,5 +1,5 @@
-# Requêtes SQL — Analyse Kiva ASS
-
+# Requêtes SQL : Analyse Kiva ASS
+Simulation
 Base de données : SQLite (`data/processed/kiva_ssa.db`)  
 Générée par : `notebooks/08_sql_analysis.py`
 
